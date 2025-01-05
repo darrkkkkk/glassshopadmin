@@ -26,34 +26,26 @@ function loadAccounts(page = currentPage) {
 }
 
 function updateTable(users) {
+    const currentUserId = document.body.getAttribute('data-user-id');
     const tbody = document.querySelector('#account-table tbody');
     tbody.innerHTML = users.map(user => `
         <tr>
-            <td>${user.username}</td>
-            <td>${user.email}</td>
-            <td>${user.role}</td>
-            <td>
-                <span class="badge ${user.status === 'active' ? 'bg-success' : 'bg-danger'}">
-                    ${user.status}
-                </span>
-            </td>
-            <td>${new Date(user.createdAt).toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' })}</td>
-            <td>
-                <div class="form-button-action">
+@@ -43,17 +44,18 @@ function updateTable(users) {
                     <button type="button" 
                             class="btn btn-link ${user.status === 'active' ? 'btn-primary btn-danger' : 'btn-success'}"
                             data-id="${user._id}" 
-                            onclick="banAccount(this)">
+                            onclick="banAccount(this)"
+                            ${user._id === currentUserId ? 'disabled title="Cannot ban your own account"' : ''}>
                         <i class="fa ${user.status === 'active' ? 'fa-ban' : 'fa-check'}">
                             ${user.status === 'active' ? 'Ban' : 'Unban'}
                         </i>
                     </button>
-                </div>
-                <button type="button" 
+                    <button type="button" 
                             class="btn btn-link btn-info me-2"
                             onclick='viewAccount(${JSON.stringify(user).replace(/'/g, "&#39;")})'>
                         <i class="fa fa-eye">View</i>
-                </button>
+                    </button>
+                </div>
             </td>
         </tr>
     `).join('');
