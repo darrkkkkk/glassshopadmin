@@ -1,0 +1,32 @@
+th[data-sortable] {
+  cursor: pointer;
+  position: relative;
+  padding-right: 25px !important;
+  user-select: none;
+}
+
+th[data-sortable]:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.sort-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.3;
+  transition: all 0.2s ease;
+}
+
+th[data-sortable]:hover .sort-icon {
+  opacity: 1;
+}
+
+th[data-sortable].active {
+  background-color: rgba(0,0,0,0.02);
+}
+
+th[data-sortable].active .sort-icon {
+  opacity: 1;
+  color: #1572E8;
+}

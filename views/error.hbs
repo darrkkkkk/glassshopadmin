@@ -1,0 +1,37 @@
+<div class="container">
+    <div class="text-center mt-5">
+        <div class="error-page">
+            <div class="error-icon mb-4">
+                {{#if (eq error.status 403)}}
+                    <i class="fas fa-lock text-danger" style="font-size: 64px;"></i>
+                {{else if (eq error.status 404)}}
+                    <i class="fas fa-search text-warning" style="font-size: 64px;"></i>
+                {{else}}
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 64px;"></i>
+                {{/if}}
+            </div>
+            
+            <h1 class="error-title text-danger mb-3">
+                {{#if (eq error.status 403)}}Access Denied{{else}}Error{{/if}}
+            </h1>
+            
+            <h2 class="error-subtitle text-muted mb-4 text-center px-4">
+                {{message}}
+            </h2>
+            
+            {{#if error.stack}}
+            <div class="error-details card mb-4">
+                <div class="card-body">
+                    <pre class="text-start bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;">
+                        <code>{{error.stack}}</code>
+                    </pre>
+                </div>
+            </div>
+            {{/if}}
+            
+            <a href="/admin" class="btn btn-primary btn-lg">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>

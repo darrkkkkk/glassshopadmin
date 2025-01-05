@@ -1,0 +1,159 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-md bg-white border border-gray-300 rounded-lg shadow-md">
+        <div class="flex flex-col items-center px-6 py-5">
+            <!-- Avatar Section -->
+            <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xl font-bold mb-4">
+                {{#if user.avatar}}
+                    <img src="{{user.avatar}}" alt="Profile Picture" class="w-full h-full rounded-full">
+                {{else}}
+    
+                    <img src="/assets/img/profile.jpg" alt="Profile Picture" class="w-full h-full rounded-full">
+                {{/if}}
+            </div>
+            <!-- Profile Info -->
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                User Profile
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500 text-center">
+                This is some information about the user.
+            </p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5">
+            {{#if user}}
+            <dl class="sm:divide-y sm:divide-gray-200">
+                <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-medium text-gray-500">Full name</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{user.username}}</dd>
+                </div>
+                <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-medium text-gray-500">Email address</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{user.email}}</dd>
+                </div>
+                <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-medium text-gray-500">Role</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{user.role}}</dd>
+                </div>
+            </dl>
+            {{/if}}
+            {{#if errorMessage}}
+                <div class="p-2 mb-4 text-xs text-red-700 bg-red-100 border border-red-300 rounded-md">
+                    {{errorMessage}}
+                </div>
+            {{/if}}
+
+            <!-- Button to show the update form -->
+            <div class="mt-4">
+                <button id="showFormButton" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    Update Profile
+                </button>
+            </div>
+            <div class="mt-4">
+                <button id="showpasswordFormButton" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    Update Password
+                </button>
+            </div>
+
+            <!-- Update Profile Form (Initially Hidden) -->
+            <form id="updateForm" action="/admin/profile" method="POST" class="hidden mt-4">
+                <h2 class="text-lg font-semibold mb-4">Update Profile</h2>
+                <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <label for="username" class="text-sm font-medium text-gray-500">Username</label>
+                    <input type="text" id="username" name="username" value="{{user.username}}" class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                </div>
+                <small id="usernameFeedback" class="text-sm"></small>
+                <div class="mb-4">
+                    <label for="avatar" class="block text-sm font-medium text-gray-700">Profile Picture</label>
+                    <input type="file" id="avatar" name="avatar" class="mt-1 p-2 w-full border rounded">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    Save Changes
+                </button>
+            </form>
+
+            <!-- Update Password Form (Initially Hidden) -->
+            <form id="passupdateForm" action="/admin/update-password" method="POST" class="hidden mt-6">
+                <h2 class="text-lg font-semibold mb-4">Update Password</h2>
+                <div class="mb-4">
+                    <label for="oldPassword" class="block text-sm font-medium text-gray-700">Old Password</label>
+                    <input type="password" id="oldPassword" name="oldPassword" required class="mt-1 p-2 w-full border rounded">
+                </div>
+                <div class="mb-4">
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required class="mt-1 p-2 w-full border rounded">
+                </div>
+                <small id="passwordFeedback" class="text-sm"></small>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<script>
+$(document).ready(function () {
+    // Toggle Update Profile Form
+    $('#showFormButton').on('click', function () {
+        $('#updateForm').toggleClass('hidden'); // Toggle the profile update form
+        $('#passupdateForm').addClass('hidden'); // Hide the password update form
+    });
+
+    // Toggle Update Password Form
+    $('#showpasswordFormButton').on('click', function () {
+        $('#passupdateForm').toggleClass('hidden'); // Toggle the password update form
+        $('#updateForm').addClass('hidden'); // Hide the profile update form
+    });
+
+    // Real-time username validation
+    $('#username').on('input', function () {
+        const username = $(this).val().trim();
+        const usernameFeedback = $('#usernameFeedback');
+        const fullNamePattern = /^[A-Z][a-z]+( [A-Z][a-z]+)+$/; // At least two words, each starting with an uppercase letter
+
+        if (username === '') {
+            usernameFeedback.text('Username is required').css('color', 'red');
+            return;
+        }
+
+        if (!fullNamePattern.test(username)) {
+            usernameFeedback.text(
+                'Username must be a full name with at least two words, starting with uppercase letters (e.g., John Doe).'
+            ).css('color', 'red');
+        } else {
+            usernameFeedback.text('Username is valid').css('color', 'green');
+        }
+    });
+
+    // Real-time password validation
+    $('#newPassword').on('input', function () {
+        const password = $(this).val();
+        const complexityPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const passwordFeedback = $('#passwordFeedback');
+
+        if (!complexityPattern.test(password)) {
+            passwordFeedback.text('Password must include uppercase, lowercase, number, and special character, and be at least 8 characters long.')
+                .css('color', 'red');
+        } else {
+            passwordFeedback.text('Password is strong.').css('color', 'green');
+        }
+    });
+
+    // Prevent form submission if validation fails
+    $('#passupdateForm').on('submit', function (e) {
+        const oldPassword = $('#oldPassword').val();
+        const newPassword = $('#newPassword').val();
+        const feedback = $('#newPassword').next('small');
+
+        if (oldPassword === '' || newPassword === '') {
+            e.preventDefault();
+            alert('Both fields are required.');
+        } else if (feedback.text().includes('must include')) {
+            e.preventDefault();
+            alert('Please ensure your new password meets the complexity requirements.');
+        }
+    });
+});
+</script>
